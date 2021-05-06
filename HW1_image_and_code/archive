@@ -1,0 +1,188 @@
+// Image class to dynamically create images
+class Image
+{
+    private:
+        // Data stored in linear fashion row-by-row
+        unsigned char *data;
+        int width, height;
+        int bytesPerPixel;
+    public:
+        Image(char *file_location, int width, int height, int bytesPerPixel){
+            this->width = width;
+            this->height = height;
+            this-> bytesPerPixel = bytesPerPixel;
+            unsigned char imageData[height][width][bytesPerPixel];
+            this->data = new unsigned char[width*height*bytesPerPixel];
+            cout << "Data size: " << width*height*bytesPerPixel << endl;
+            for (int i=0; i<width*height*bytesPerPixel; i++){
+                this->data[i] = 0;
+            }
+            
+            FILE *file;
+            if(!(file=fopen(file_location, "rb"))){
+                cout << "Cannot open file: " << file_location << endl;
+                exit(1);
+            }
+            fread(imageData, sizeof(unsigned char), width*height*bytesPerPixel, file);
+            fclose(file);
+
+            for(int i=0; i<height; i++){
+                for(int j=0; j<width; j++){
+                    for(int k=0; k<bytesPerPixel; k++)
+                        this->data[i + j*height + k*height*bytesPerPixel] = imageData[i][j][k];  
+                }
+            }
+            cout << "Loaded image: " << file_location << endl;
+        }
+        const unsigned char get(int i, int j, int k, bool debug=false){
+            //Reflection padding cases
+            if (debug==true) {
+                cout <<"Original Coordinates: "<< i <<"," <<j << endl;
+            }
+            int orig_i = i;
+            int orig_j = j;
+            if (i<0){
+                i = -i;
+            }
+            if (j<0){
+                j=-j;
+            }
+            if (i>=this->height){
+                i = 2*(this->height-1)- i; 
+            }
+            if (j>=this->width){
+                j = 2*(this->width-1) - j;
+            }
+            if (debug==true) {
+                cout <<"Fetched Coordinates: "<< i <<"," <<j << endl;
+            }
+            // if ((orig_i-i)^2>2 or (orig_j-j)^2>2){
+            //     cout << "False address" << pow(orig_i-i,2) << " " << pow(orig_j-j,2) << endl; 
+            // }
+            return this->data[i + j*this->height + k*this->height*this->bytesPerPixel];
+        }
+        void set(unsigned char val, int i, int j, int k){
+            this->data[i + j*this->width + k*this->width*this->bytesPerPixel] = val;
+        }
+        void saveImage(char* file_location){
+            unsigned char outputData[this->height][this->width][this->bytesPerPixel];
+
+            for(int i=0;i<this->height;i++){
+                for(int j=0;j<this->width;j++){
+                    for(int k=0;k<this->bytesPerPixel;k++){
+                        outputData[i][j][k] = get(i,j,k);
+                    }
+                }
+            }
+
+            FILE *file;
+            if(!(file=fopen(file_location,"wb"))){
+                cout << "Unable to load file: " << file_location;
+                exit(1);
+            }
+            fwrite(outputData, sizeof(unsigned char), this->height*this->width*this->bytesPerPixel, file);
+            fclose(file);
+        }
+        int checkColor(int i, int j){
+            if(i%2==0){
+                if (j%2==0)
+                    return GREEN;
+                else
+                    return BLUE;
+            }
+            else{
+                if (j%2==0)
+                    return RED;
+                else
+                    return GREEN;
+            }
+        }
+        void performDemosaic(char* output_location){
+            unsigned char outputData[this->height][this->width][3];
+            
+            for(int i=0; i<this->height; i++){
+                for(int j=0;j<this->width; j++){
+                    for(int k=0;k<3;k++){
+                        outputData[i][j][k] = 0;
+                    }
+                }
+            }
+
+            for(int i=0; i<this->height; i++){
+                for(int j=0; j<this->width; j++){
+                    // outputData[i][j][GREEN] = get(i,j,0);
+                    // outputData[i][j][RED] = get(i,j,0);
+                    // outputData[i][j][BLUE] = get(i,j,0);
+                    if (outputData[i][j][GREEN]!=0 or outputData[i][j][RED]!=0 or outputData[i][j][BLUE]!=0)
+                        cout << "Wrong init " << i << " " << j << endl;
+                    int color = checkColor(j,i);
+                    cout << color;
+
+                    if (color == GREEN){
+                        outputData[i][j][GREEN] = (unsigned char)get(i,j,0);
+                        if (i%2==0){
+                            // cout << (int)get(i,j-1,0) << " " << (int)get(i,j+1,0) << " " << (0.5 * ((float)get(i,j-1,0)+(float)get(i,j+1,0))) << endl;
+                        outputData[i][j][RED] = (unsigned char)(int)(0.5 * ((float)this->get(i,j-1,0)+(float)this->get(i,j+1,0)));
+                        outputData[i][j][BLUE] = (unsigned char)(int)(0.5 * ((float)this->get(i-1,j,0)+(float)this->get(i+1,j,0)));
+                        }
+                        else{
+                        outputData[i][j][BLUE] = (unsigned char)(int)(0.5 * ((float)get(i,j-1,0)+(float)get(i,j+1,0)));
+                        outputData[i][j][RED] = (unsigned char)(int)(0.5 * ((float)get(i-1,j,0)+(float)get(i+1,j,0)));
+
+                        }
+                        
+                    }
+                    else if (color==RED){
+                        outputData[i][j][RED] = (unsigned char)get(i,j,0);
+                        outputData[i][j][GREEN] = (unsigned char)(int)(0.25 * ((float)get(i,j-1,0)+(float)get(i,j+1,0)+(float)get(i-1,j,0)+(float)get(i+1,j,0)));
+                        outputData[i][j][BLUE] = (unsigned char)(int)(0.25 * ((float)get(i-1,j-1,0)+(float)get(i-1,j+1,0)+(float)get(i+1,j+1,0)+(float)get(i+1,j-1,0)));
+                    }
+                    else if (color==BLUE){
+                        outputData[i][j][BLUE] = (unsigned char)get(i,j,0);
+                        outputData[i][j][GREEN] = (unsigned char)(int)(0.25 * ((float)get(i,j-1,0)+(float)get(i,j+1,0)+(float)get(i-1,j,0)+(float)get(i+1,j,0)));
+                        outputData[i][j][RED] = (unsigned char)(int)(0.25 * ((float)get(i-1,j-1,0)+(float)get(i-1,j+1,0)+(float)get(i+1,j+1,0)+(float)get(i+1,j-1,0)));
+                    }
+                    else{
+                        cout << " NOPE " << endl;
+                    }
+                }
+                cout << endl;
+            }   
+
+            FILE *file;
+            if(!(file=fopen(output_location, "wb"))){
+                cout << "Unable to open file: " << output_location << endl;
+                exit(1);
+            }
+            fwrite(outputData, sizeof(unsigned char), this->width*this->height*3, file);
+            fclose(file);
+            cout << "Demosaicing completed!" << endl;
+            this->saveImage("house_final.raw");
+        }
+        void methodA(char *file_location, char* histFileLocation="histogramMethodA.csv"){
+            int counter[256];
+            for(int i=0;i<256;i++)
+                counter[i]=0;
+            
+            for (int i=0;i<this->width*this->height;i++)
+                counter[this->data[i]]+=1;
+            
+            for(int i=1;i<256;i++)
+                counter[i] += counter[i-1];
+            for (int i=0;i<this->width;i++){
+                for(int j=0;j<this->height;j++){
+                    unsigned char pixel = get(i,j,0);
+                    cout << " CDF " << (int)pixel <<" "<< counter[pixel]<< " " <<((float)counter[pixel]/((float)this->width*this->height))<<endl;
+                    set((unsigned char)(255*((float)counter[get(i,j,0)]/((float)this->width*this->height))),i,j,0);
+                }
+            }
+            saveImage(file_location);
+
+            ofstream histFile;
+            histFile.open(histFileLocation);
+            for(int i=0;i<256;i++){
+                histFile << (int)(255*((float)counter[i]/((float)this->width*this->height))) << ",";
+            }
+            histFile.close();
+    }
+};

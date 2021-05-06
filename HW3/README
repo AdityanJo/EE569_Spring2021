@@ -1,0 +1,14 @@
+g++ problem1.cc -o problem1
+g++ -I/usr/local/include/opencv4/ -I/usr/local/include/opencv4/opencv2/ -L/usr/local/lib/ -g -o problem2 problem2.cc -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_xfeatures2d -lopencv_features2d
+g++ problem3.cc -o problem3
+
+./problem1 HW3_material/Dog.raw HW3_material/Dog_out.raw HW3_material/Dog_rec_out.raw 
+./problem1 HW3_material/Forky.raw HW3_material/Forky_out.raw HW3_material/Forky_rec_out.raw 
+./problem1 HW3_material/22.raw HW3_material/22_out.raw HW3_material/22_rec_out.raw 
+./problem2 HW3_material/left.raw HW3_material/middle.raw HW3_material/right_updated.raw HW3_material/out_stitch.raw
+./problem3 HW3_material/spring.raw HW3_material/spring_out.raw 422 322 1 0
+./problem3 HW3_material/jar.raw HW3_material/jar_out.raw 252 252 1 0
+./problem3 HW3_material/flower.raw HW3_material/flower_out.raw 247 247 1 0
+./problem3 HW3_material/maze.raw HW3_material/maze_out.raw 343 343 1 1
+./problem3 HW3_material/horse.raw HW3_material/horse_out.raw 422 322 1 2
+./problem3 HW3_material/horse.raw HW3_material/horse_out.raw 422 322 1 3

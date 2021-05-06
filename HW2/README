@@ -1,0 +1,55 @@
+g++ -I/usr/local/include/opencv4/ -I/usr/local/include/opencv4/opencv2/ -L/usr/local/lib/ -g -o problem1 problem1.cc -lopencv_core -lopencv_imgproc -lopencv_highgui
+g++ problem2.cc -o problem2
+g++ problem3.cc -o problem3
+./problem2 0 HW2_materials/bridge.raw HW2_materials/bridge_fixed.raw 332 501 1 130
+./problem2 1 HW2_materials/bridge.raw HW2_materials/bridge_random.raw 332 501 1
+./problem2 2 HW2_materials/bridge.raw HW2_materials/bridge_dither_i2.raw 332 501 1 2
+./problem2 2 HW2_materials/bridge.raw HW2_materials/bridge_dither_i8.raw 332 501 1 8
+./problem2 2 HW2_materials/bridge.raw HW2_materials/bridge_dither_i32.raw 332 501 1 32
+./problem2 3 HW2_materials/bridge.raw HW2_materials/bridge_fsErrDiff.raw 332 501 1 0.6 0
+./problem2 3 HW2_materials/bridge.raw HW2_materials/bridge_jjnErrDiff.raw 332 501 1 0.5 1
+./problem2 3 HW2_materials/bridge.raw HW2_materials/bridge_stuckiErrDiff.raw 332 501 1 0.5 2
+
+
+
+138.142,220.906            
+32.1835,172.856              
+80.0924,192.86                
+65.293,186.828                
+434.251,137.834         
+28.5939,170.83      
+104.15,202.86            
+17.3284,166.795             
+18.8602,166.803            
+419.728,131.772        
+357.075,105.874        
+414.993,129.816        
+99.4313,200.768        
+366.363,109.842        
+410.337,127.774        
+400.797,123.789        
+405.154,125.785        
+82.818,202.838        
+19.859,173.132      
+67.6325,193.128         
+
+81.7363,161.915 
+75.7645,149.914 
+73.4516,145.918  
+105.82,209.9     
+107.972,213.899 
+151.74,301.875
+53.0911,106.006   
+118.553,235.88  
+156.712,311.873 
+365.056,258.048 
+133.988,265.868 
+359.532,247.983 
+65.6877,129.831 
+136.602,225.049 
+144.277,244.089 
+327.694,202.034 
+79.9469,147.037 
+91.8543,159.031 
+86.9983,121.9 
+52.8167,103.994 

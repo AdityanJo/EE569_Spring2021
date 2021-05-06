@@ -1,0 +1,11 @@
+# Built on Matlab Online '9.10.0.1629609 (R2021a)'
+
+# problem1 takes two variables train_folder, test_folder and setting the path in them should run the solution for the complete problem
+# problem2 takes only the location of the composite.png 
+# problem3 takes the locations of the 4 images
+
+# the solutions assume all of the data/images to be in the current location to run
+
+problem1
+problem2
+problem3
